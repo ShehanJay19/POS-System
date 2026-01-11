@@ -4,11 +4,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to dashboard
-Route::redirect('/', '/dashboard');
+Route::redirect('/', '/login');
 
 // Protected POS System Routes (require login)
 Route::middleware('auth')->group(function () {
@@ -19,6 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
     Route::resource('sales', SaleController::class);
+    Route::resource('purchases', PurchaseController::class);
+    Route::resource('quotations', QuotationController::class);
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

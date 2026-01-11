@@ -10,9 +10,18 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold mb-4">Available Products</h3>
-                        <div class="space-y-2 max-h-96 overflow-y-auto">
+
+                        <div class="mb-4">
+                            <label for="productSearch" class="sr-only">Search products</label>
+                            <div class="relative">
+                                <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" /></svg>
+                                <input id="productSearch" type="text" placeholder="Search by name or SKU" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" oninput="filterProducts()">
+                            </div>
+                        </div>
+
+                        <div id="productList" class="space-y-2 max-h-96 overflow-y-auto">
                             @foreach($products as $product)
-                                <div class="border rounded p-3 hover:bg-gray-50 cursor-pointer" onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->quantity }})">
+                                <div class="product-item border rounded p-3 hover:bg-gray-50 cursor-pointer" data-name="{{ strtolower($product->name) }}" data-sku="{{ strtolower($product->sku) }}" onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->quantity }})">
                                     <div class="flex justify-between">
                                         <div>
                                             <div class="font-semibold">{{ $product->name }}</div>
@@ -33,10 +42,10 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold mb-4">Cart</h3>
-                        
+
                         <form action="{{ route('sales.store') }}" method="POST" id="saleForm">
                             @csrf
-                            
+
                             <div id="cartItems" class="space-y-2 mb-4 max-h-64 overflow-y-auto">
                                 <p class="text-gray-500 text-center py-8">Cart is empty</p>
                             </div>
@@ -72,9 +81,21 @@
         let cart = [];
         let total = 0;
 
+        function filterProducts() {
+            const query = document.getElementById('productSearch')?.value.toLowerCase().trim();
+            const items = document.querySelectorAll('#productList .product-item');
+            if (!items) return;
+            items.forEach(item => {
+                const name = item.dataset.name || '';
+                const sku = item.dataset.sku || '';
+                const match = !query || name.includes(query) || sku.includes(query);
+                item.style.display = match ? '' : 'none';
+            });
+        }
+
         function addToCart(productId, name, price, maxQuantity) {
             const existingItem = cart.find(item => item.product_id === productId);
-            
+
             if (existingItem) {
                 if (existingItem.quantity < maxQuantity) {
                     existingItem.quantity++;
@@ -91,7 +112,7 @@
                     maxQuantity: maxQuantity
                 });
             }
-            
+
             updateCart();
         }
 
@@ -119,11 +140,11 @@
             const cartContainer = document.getElementById('cartItems');
             const form = document.getElementById('saleForm');
             const checkoutBtn = document.getElementById('checkoutBtn');
-            
+
             // Clear existing hidden inputs
             const existingInputs = form.querySelectorAll('input[name^="items"]');
             existingInputs.forEach(input => input.remove());
-            
+
             if (cart.length === 0) {
                 cartContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Cart is empty</p>';
                 checkoutBtn.disabled = true;
@@ -131,11 +152,11 @@
             } else {
                 let html = '';
                 total = 0;
-                
+
                 cart.forEach((item, index) => {
                     const subtotal = item.price * item.quantity;
                     total += subtotal;
-                    
+
                     html += `
                         <div class="border rounded p-3 flex justify-between items-center">
                             <div class="flex-1">
@@ -151,25 +172,25 @@
                             </div>
                         </div>
                     `;
-                    
+
                     // Add hidden inputs for form submission
                     const productInput = document.createElement('input');
                     productInput.type = 'hidden';
                     productInput.name = `items[${index}][product_id]`;
                     productInput.value = item.product_id;
                     form.appendChild(productInput);
-                    
+
                     const quantityInput = document.createElement('input');
                     quantityInput.type = 'hidden';
                     quantityInput.name = `items[${index}][quantity]`;
                     quantityInput.value = item.quantity;
                     form.appendChild(quantityInput);
                 });
-                
+
                 cartContainer.innerHTML = html;
                 checkoutBtn.disabled = false;
             }
-            
+
             document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
         }
     </script>
