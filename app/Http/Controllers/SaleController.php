@@ -92,8 +92,8 @@ class SaleController extends Controller
      */
     public function show(string $id)
     {
-        $sales=Sale::with(['user','saleItems.product','payment'])->findOrFail($id);
-        return view('sales.show',compact('sales'));
+        $sale = Sale::with(['user','saleItems.product','payments'])->findOrFail($id);
+        return view('sales.show', compact('sale'));
     }
 
     /**
