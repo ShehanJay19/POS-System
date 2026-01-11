@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('sale_id');
+            $table->decimal('amount', 10, 2);
+            $table->string('payment_type');
+            $table->dateTime('date');
+            $table->foreign('sale_id')->references('id')->on('sales')->onDelete('cascade');
             $table->timestamps();
         });
     }
