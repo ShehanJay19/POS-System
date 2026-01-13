@@ -2,8 +2,8 @@
     <div class="p-8 space-y-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Reports</h1>
-                <p class="text-gray-600 mt-1">Daily, weekly, and monthly performance snapshots</p>
+                <h1 class="text-3xl font-bold text-gray-900">Sales Reports</h1>
+                <p class="text-gray-600 mt-1">Live metrics from your sales data</p>
             </div>
             <div class="flex items-center gap-3">
                 <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50">Export</button>
@@ -11,70 +11,112 @@
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex gap-2">
-            <button class="px-4 py-2 rounded-lg bg-indigo-600 text-white">Daily</button>
-            <button class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">Weekly</button>
-            <button class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">Monthly</button>
-        </div>
-
         <!-- KPI cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             <div class="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                <p class="text-sm text-gray-500">Sales</p>
-                <p class="text-3xl font-bold text-gray-900">$12,450</p>
-                <p class="text-sm text-green-600 mt-1">+8% vs prev</p>
+                <p class="text-sm text-gray-500">Total Sales</p>
+                <p class="text-3xl font-bold text-gray-900">${{ number_format($totalSales, 2) }}</p>
+                <p class="text-sm text-gray-500 mt-1">All-time revenue</p>
             </div>
             <div class="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                <p class="text-sm text-gray-500">Purchases</p>
-                <p class="text-3xl font-bold text-gray-900">$6,320</p>
-                <p class="text-sm text-green-600 mt-1">+3% vs prev</p>
+                <p class="text-sm text-gray-500">Orders</p>
+                <p class="text-3xl font-bold text-gray-900">{{ $ordersCount }}</p>
+                <p class="text-sm text-gray-500 mt-1">Completed sales</p>
             </div>
             <div class="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                <p class="text-sm text-gray-500">Returns</p>
-                <p class="text-3xl font-bold text-gray-900">$430</p>
-                <p class="text-sm text-red-600 mt-1">-2% vs prev</p>
+                <p class="text-sm text-gray-500">Avg Order</p>
+                <p class="text-3xl font-bold text-gray-900">${{ number_format($avgOrderValue, 2) }}</p>
+                <p class="text-sm text-gray-500 mt-1">Mean ticket size</p>
             </div>
             <div class="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                <p class="text-sm text-gray-500">Net Profit</p>
-                <p class="text-3xl font-bold text-gray-900">$5,700</p>
-                <p class="text-sm text-green-600 mt-1">+5% vs prev</p>
+                <p class="text-sm text-gray-500">Today</p>
+                <p class="text-3xl font-bold text-gray-900">${{ number_format($todaySales, 2) }}</p>
+                <p class="text-sm text-gray-500 mt-1">Sales today</p>
             </div>
         </div>
 
-        <!-- Charts Row -->
+        <!-- Quick charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Sales Trend</h2>
+                        <p class="text-sm text-gray-500">Visual snapshot of the last 7 days</p>
+                    </div>
+                </div>
+                <div class="h-64 bg-gray-50 border border-dashed border-gray-200 rounded flex items-center justify-center text-gray-400">
+                    Line/area chart placeholder
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Category Mix</h2>
+                        <p class="text-sm text-gray-500">Share of revenue by category</p>
+                    </div>
+                </div>
+                <div class="h-64 bg-gray-50 border border-dashed border-gray-200 rounded flex items-center justify-center text-gray-400">
+                    Donut chart placeholder
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales trend & categories -->
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div class="xl:col-span-2 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900">Sales vs Purchases</h2>
-                        <p class="text-sm text-gray-500">Trend over selected period</p>
+                        <h2 class="text-lg font-semibold text-gray-900">Last 7 Days</h2>
+                        <p class="text-sm text-gray-500">Daily sales totals</p>
                     </div>
-                    <button class="text-sm text-gray-600 hover:text-gray-900">More</button>
                 </div>
-                <div class="h-72 bg-gray-50 border border-dashed border-gray-200 rounded flex items-center justify-center text-gray-400">
-                    Line/Area Chart Placeholder
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            @forelse($dailyAggregates as $day)
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-900">{{ \Carbon\Carbon::parse($day->date)->format('M d, Y') }}</td>
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">${{ number_format($day->sales, 2) }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ $day->orders }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-3 text-sm text-gray-500 text-center">No sales yet</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Category Mix</h2>
-                    <button class="text-sm text-gray-600 hover:text-gray-900">More</button>
+                    <h2 class="text-lg font-semibold text-gray-900">Top Categories</h2>
                 </div>
-                <div class="h-72 bg-gray-50 border border-dashed border-gray-200 rounded flex items-center justify-center text-gray-400">
-                    Pie/Donut Chart Placeholder
+                <div class="space-y-3">
+                    @forelse($categoryMix as $row)
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-700">{{ $row->category }}</span>
+                            <span class="font-semibold text-gray-900">${{ number_format($row->total, 2) }}</span>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-500">No category sales yet</p>
+                    @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- Table -->
+        <!-- Recent orders -->
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
             <div class="p-6 border-b border-gray-200 flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900">Recent Daily Reports</h2>
-                <div class="flex items-center gap-3">
-                    <input type="date" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Filter</button>
-                </div>
+                <h2 class="text-lg font-semibold text-gray-900">Recent Daily Sales</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
@@ -82,26 +124,21 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchases</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Returns</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        <tr>
-                            <td class="px-6 py-4 text-sm text-gray-900">2026-01-12</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">$1,240</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">$620</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">$40</td>
-                            <td class="px-6 py-4 text-sm font-semibold text-green-600">$580</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 text-sm text-gray-900">2026-01-11</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">$980</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">$430</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">$30</td>
-                            <td class="px-6 py-4 text-sm font-semibold text-green-600">$520</td>
-                        </tr>
+                        @forelse($dailyAggregates as $day)
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ \Carbon\Carbon::parse($day->date)->format('Y-m-d') }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">${{ number_format($day->sales, 2) }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ $day->orders }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No sales data available</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

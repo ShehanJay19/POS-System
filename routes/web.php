@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     // POS System Routes
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
+    Route::get('/api/products/search-by-barcode', [ProductController::class, 'searchByBarcode'])->name('products.search-barcode');
     Route::resource('sales', SaleController::class);
     Route::resource('purchases', PurchaseController::class);
     Route::resource('quotations', QuotationController::class);

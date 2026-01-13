@@ -32,6 +32,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'sku' => 'required|string|max:255|unique:products,sku,' ,
+            'barcode' => 'nullable|string|max:255|unique:products,barcode',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -70,6 +71,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'sku' => 'required|string|max:255|unique:products,sku,' . ($id ? ',' . $id : ''),
+            'barcode' => 'nullable|string|max:255|unique:products,barcode,' . ($id ? ',' . $id : ''),
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -92,5 +94,34 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect('/products')->with('success', 'Product deleted successfully.');
+    }
+
+    /**
+     * Search product by barcode (API endpoint)
+     */
+    public function searchByBarcode(Request $request)
+    {
+        $barcode = $request->query('barcode');
+
+        if (!$barcode) {
+            return response()->json(['error' => 'Barcode is required'], 400);
+        }
+
+        $product = Product::findByBarcode($barcode);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        return response()->json([
+            'id' => $product->id,
+            'name' => $product->name,
+            'barcode' => $product->barcode,
+            'sku' => $product->sku,
+            'price' => $product->price,
+            'quantity' => $product->quantity,
+            'category_id' => $product->category_id,
+            'category' => $product->category->name ?? null,
+        ]);
     }
 }

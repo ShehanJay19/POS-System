@@ -11,6 +11,23 @@
                     <div class="p-6">
                         <h3 class="text-lg font-semibold mb-4">Available Products</h3>
 
+                        <!-- Barcode Scanner Input -->
+                        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <label for="barcodeInput" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Scan Barcode or SKU
+                            </label>
+                            <input
+                                id="barcodeInput"
+                                type="text"
+                                placeholder="Scan barcode here..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                autocomplete="off">
+                            <p class="text-xs text-gray-600 mt-2">👉 Focus on this field and scan your barcode</p>
+                        </div>
+
                         <div class="mb-4">
                             <label for="productSearch" class="sr-only">Search products</label>
                             <div class="relative">
@@ -21,11 +38,11 @@
 
                         <div id="productList" class="space-y-2 max-h-96 overflow-y-auto">
                             @foreach($products as $product)
-                                <div class="product-item border rounded p-3 hover:bg-gray-50 cursor-pointer" data-name="{{ strtolower($product->name) }}" data-sku="{{ strtolower($product->sku) }}" onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->quantity }})">
+                                <div class="product-item border rounded p-3 hover:bg-gray-50 cursor-pointer" data-name="{{ strtolower($product->name) }}" data-sku="{{ strtolower($product->sku) }}" data-barcode="{{ strtolower($product->barcode ?? '') }}" onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->quantity }})">
                                     <div class="flex justify-between">
                                         <div>
                                             <div class="font-semibold">{{ $product->name }}</div>
-                                            <div class="text-sm text-gray-500">{{ $product->sku }}</div>
+                                            <div class="text-sm text-gray-500">SKU: {{ $product->sku }} {{ $product->barcode ? '| Barcode: ' . $product->barcode : '' }}</div>
                                         </div>
                                         <div class="text-right">
                                             <div class="font-semibold text-green-600">${{ number_format($product->price, 2) }}</div>
@@ -81,6 +98,60 @@
         let cart = [];
         let total = 0;
 
+        // Focus on barcode input on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('barcodeInput').focus();
+        });
+
+        // Handle barcode scanning
+        document.getElementById('barcodeInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const barcode = this.value.trim();
+
+                if (barcode) {
+                    searchByBarcode(barcode);
+                    this.value = ''; // Clear input for next scan
+                    this.focus(); // Keep focus on input
+                }
+            }
+        });
+
+        // Search product by barcode using API
+        async function searchByBarcode(barcode) {
+            try {
+                const response = await fetch(`/api/products/search-by-barcode?barcode=${encodeURIComponent(barcode)}`);
+
+                if (response.ok) {
+                    const product = await response.json();
+                    addToCart(product.id, product.name, product.price, product.quantity);
+
+                    // Show success message
+                    showNotification(`Added: ${product.name}`, 'success');
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Product not found', 'error');
+                }
+            } catch (error) {
+                console.error('Error scanning barcode:', error);
+                showNotification('Error scanning barcode', 'error');
+            }
+        }
+
+        // Show temporary notification
+        function showNotification(message, type = 'info') {
+            const notif = document.createElement('div');
+            notif.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white ${
+                type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            notif.textContent = message;
+            document.body.appendChild(notif);
+
+            setTimeout(() => {
+                notif.remove();
+            }, 3000);
+        }
+
         function filterProducts() {
             const query = document.getElementById('productSearch')?.value.toLowerCase().trim();
             const items = document.querySelectorAll('#productList .product-item');
@@ -88,7 +159,8 @@
             items.forEach(item => {
                 const name = item.dataset.name || '';
                 const sku = item.dataset.sku || '';
-                const match = !query || name.includes(query) || sku.includes(query);
+                const barcode = item.dataset.barcode || '';
+                const match = !query || name.includes(query) || sku.includes(query) || barcode.includes(query);
                 item.style.display = match ? '' : 'none';
             });
         }

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable=[
+        'sku',
+        'barcode',
         'name',
         'description',
         'price',
@@ -24,5 +26,13 @@ class Product extends Model
     public function saleItems()
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    /**
+     * Find product by barcode
+     */
+    public static function findByBarcode($barcode)
+    {
+        return self::where('barcode', $barcode)->first();
     }
 }

@@ -10,29 +10,36 @@
                     <form action="{{ route('products.update', $product->id) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        
+
                         <div class="mb-4">
                             <label for="sku" class="block text-gray-700 text-sm font-bold mb-2">SKU</label>
-                            <input type="text" name="sku" id="sku" value="{{ old('sku', $product->sku) }}" 
+                            <input type="text" name="sku" id="sku" value="{{ old('sku', $product->sku) }}"
                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                    required>
                         </div>
 
                         <div class="mb-4">
+                            <label for="barcode" class="block text-gray-700 text-sm font-bold mb-2">Barcode (Optional)</label>
+                            <input type="text" name="barcode" id="barcode" value="{{ old('barcode', $product->barcode) }}"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                   placeholder="Enter or scan barcode">
+                        </div>
+
+                        <div class="mb-4">
                             <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $product->name) }}" 
+                            <input type="text" name="name" id="name" value="{{ old('name', $product->name) }}"
                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                    required>
                         </div>
 
                         <div class="mb-4">
                             <label for="category_id" class="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                            <select name="category_id" id="category_id" 
+                            <select name="category_id" id="category_id"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     required>
                                 <option value="">Select Category</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" 
+                                    <option value="{{ $category->id }}"
                                         {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
                                         {{ $category->name }}
                                     </option>
@@ -56,16 +63,16 @@
 
                         <div class="mb-4">
                             <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                            <textarea name="description" id="description" rows="4" 
+                            <textarea name="description" id="description" rows="4"
                                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('description', $product->description) }}</textarea>
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <button type="submit" 
+                            <button type="submit"
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Update Product
                             </button>
-                            <a href="{{ route('products.index') }}" 
+                            <a href="{{ route('products.index') }}"
                                class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
                                 Cancel
                             </a>
